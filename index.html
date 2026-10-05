@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d1b">
+  <title>Lucky Lantern | Social Game Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f3f1e9;
+      --muted: #a6b4aa;
+      --dim: #708078;
+      --page: #101d1b;
+      --panel: #172724;
+      --panel-raised: #1d302b;
+      --line: rgba(229, 239, 225, .1);
+      --mint: #c7ef9b;
+      --mint-ink: #18251c;
+      --coral: #fb8468;
+      --gold: #edc775;
+      --red: #f07e74;
+      --green: #6cbf91;
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Fraunces', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+    button { color: inherit; font: inherit; }
+    button:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 224px minmax(0, 1fr); }
+    .rail { position: sticky; top: 0; height: 100vh; padding: 25px 16px 18px; background: #14221f; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 8px; margin-bottom: 35px; }
+    .brand-mark { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--mint); color: #203328; font-family: var(--display); font-size: 22px; transform: rotate(-5deg); }
+    .brand-name { font-size: 15px; font-weight: 700; letter-spacing: .1px; }
+    .brand-sub { color: var(--dim); font-size: 10px; margin-top: 2px; }
+    .rail-label { color: var(--dim); text-transform: uppercase; font-size: 10px; font-weight: 700; letter-spacing: 1.1px; padding: 0 10px; margin: 0 0 10px; }
+    .nav-list { display: grid; gap: 5px; }
+    .nav-button { width: 100%; display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: var(--muted); text-align: left; padding: 11px 10px; border-radius: 8px; cursor: pointer; transition: background .18s, color .18s; }
+    .nav-button:hover { background: rgba(255,255,255,.045); color: var(--ink); }
+    .nav-button.active { background: #263b33; color: var(--mint); }
+    .nav-icon { display: grid; place-items: center; width: 21px; font-size: 16px; }
+    .nav-count { margin-left: auto; font-size: 10px; color: var(--dim); }
+    .rail-bottom { margin-top: auto; }
+    .demo-note { margin: 20px 4px 0; padding: 13px 12px; border: 1px solid rgba(199,239,155,.15); border-radius: 8px; background: rgba(199,239,155,.045); }
+    .demo-note strong { display: block; color: var(--mint); font-size: 11px; margin-bottom: 5px; }
+    .demo-note p { color: var(--muted); font-size: 10px; line-height: 1.55; margin: 0; }
+    .main { min-width: 0; padding: 0 34px 36px; }
+    .topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); gap: 16px; }
+    .crumb { color: var(--muted); font-size: 12px; }
+    .crumb span { color: var(--dim); padding: 0 7px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .demo-pill { color: var(--mint); background: rgba(199,239,155,.09); border: 1px solid rgba(199,239,155,.16); border-radius: 99px; padding: 7px 10px; font-size: 10px; font-weight: 700; letter-spacing: .25px; white-space: nowrap; }
+    .wallet { display: flex; align-items: center; gap: 9px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 8px 7px 12px; }
+    .coin { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: #473618; font-family: var(--display); font-weight: 700; font-size: 13px; }
+    .balance { min-width: 67px; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
+    .balance small { display: block; color: var(--dim); font-size: 9px; font-weight: 500; margin-top: 1px; }
+    .add-funds { border: 0; background: var(--mint); color: var(--mint-ink); border-radius: 6px; padding: 8px 11px; font-weight: 700; font-size: 11px; cursor: pointer; white-space: nowrap; transition: filter .18s; }
+    .add-funds:hover { filter: brightness(1.08); }
+    .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 30px 0 21px; }
+    .eyebrow { color: var(--mint); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 7px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font: 600 30px/1.15 var(--display); margin-bottom: 7px; }
+    .heading-copy { color: var(--muted); font-size: 12px; margin: 0; }
+    .online { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; padding-bottom: 3px; white-space: nowrap; }
+    .online-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px rgba(108,191,145,.5); }
+    .game-tabs { display: flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--line); padding-bottom: 13px; margin-bottom: 19px; overflow-x: auto; }
+    .game-tab { border: 1px solid transparent; background: transparent; color: var(--muted); border-radius: 7px; padding: 9px 12px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: .18s; }
+    .game-tab:hover { background: rgba(255,255,255,.04); color: var(--ink); }
+    .game-tab.active { background: #253a32; color: var(--mint); border-color: rgba(199,239,155,.14); }
+    .tab-icon { margin-right: 7px; }
+    .table-layout { display: grid; grid-template-columns: minmax(0, 1fr) 286px; align-items: start; gap: 18px; }
+    .play-panel { min-width: 0; }
+    .table-topline { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 12px; }
+    .table-name { font-size: 12px; font-weight: 700; }
+    .table-limits { color: var(--dim); font-size: 10px; }
+    .felt { min-height: 372px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 25px 22px 20px; border: 1px solid rgba(199,239,155,.17); border-radius: 10px; background: radial-gradient(ellipse at 50% 42%, #28644b 0%, #1e503d 43%, #163b30 100%); box-shadow: inset 0 0 0 7px rgba(10,35,27,.18), inset 0 0 65px rgba(5,23,18,.3); }
+    .felt::before, .felt::after { content: ''; position: absolute; border: 1px solid rgba(224,244,201,.11); border-radius: 50%; pointer-events: none; }
+    .felt::before { width: 72%; height: 67%; top: 16%; }
+    .felt::after { width: 54%; height: 49%; top: 25%; }
+    .table-label { z-index: 1; align-self: flex-start; display: flex; align-items: center; gap: 7px; color: rgba(237,247,230,.76); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.1px; }
+    .table-label .spark { color: var(--gold); font-size: 14px; }
+    .table-center { z-index: 1; width: 100%; min-height: 218px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .table-center h2 { font: 600 21px var(--display); margin-bottom: 5px; }
+    .table-center p { color: rgba(239,246,231,.68); font-size: 11px; margin: 0; }
+    .hands { display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 24px; width: 100%; }
+    .hand { min-width: 136px; }
+    .hand-caption { color: rgba(241,248,235,.75); text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: .9px; margin-bottom: 8px; }
+    .hand-cards { display: flex; justify-content: center; min-height: 89px; }
+    .playing-card { position: relative; width: 57px; height: 82px; margin-left: -8px; border: 1px solid #e8e4d9; border-radius: 6px; background: #f5f1e6; color: #26302b; box-shadow: 0 5px 10px rgba(0,0,0,.2); display: flex; align-items: center; justify-content: center; font: 700 22px var(--display); }
+    .playing-card:first-child { margin-left: 0; }
+    .playing-card.red { color: #c94f4a; }
+    .playing-card .corner { position: absolute; top: 5px; left: 6px; font: 700 9px/1 var(--sans); text-align: center; }
+    .playing-card .corner.bottom { inset: auto 6px 5px auto; transform: rotate(180deg); }
+    .playing-card.back { color: var(--gold); background: repeating-linear-gradient(45deg,#284c3e 0,#284c3e 4px,#315b48 4px,#315b48 8px); border: 3px solid #e8e4d9; }
+    .opponent-cards .playing-card { width: 34px; height: 48px; margin-left: -7px; font-size: 13px; }
+    .opponent-cards .playing-card:first-child { margin-left: 0; }
+    .table-footer { z-index: 1; color: rgba(239,246,231,.62); font-size: 10px; min-height: 13px; text-align: center; }
+    .result-text { color: var(--gold) !important; font-weight: 700; }
+    .game-controls { display: flex; align-items: stretch; justify-content: center; gap: 9px; margin-top: 13px; }
+    .primary-button, .secondary-button { min-height: 39px; border-radius: 7px; padding: 0 16px; font-size: 11px; font-weight: 700; cursor: pointer; transition: transform .15s, filter .15s, background .15s; }
+    .primary-button { border: 0; background: var(--mint); color: var(--mint-ink); }
+    .secondary-button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+    .primary-button:hover:not(:disabled), .secondary-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+    button:disabled { opacity: .42; cursor: not-allowed; }
+    .side-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+    .side-section { padding: 16px; border-bottom: 1px solid var(--line); }
+    .side-section:last-child { border-bottom: 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .section-head h3 { font-size: 11px; margin: 0; font-weight: 700; }
+    .min-max { color: var(--dim); font-size: 9px; }
+    .bet-amount { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 7px; background: #12201d; padding: 7px; }
+    .bet-adjust { border: 0; border-radius: 5px; background: var(--panel-raised); width: 27px; height: 27px; font-size: 17px; cursor: pointer; }
+    .bet-adjust:hover { color: var(--mint); }
+    .bet-value { color: var(--gold); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .bet-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 9px; }
+    .bet-chip { height: 27px; border-radius: 5px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 9px; font-weight: 700; cursor: pointer; }
+    .bet-chip:hover, .bet-chip.active { color: var(--mint); border-color: rgba(199,239,155,.38); background: rgba(199,239,155,.06); }
+    .bet-hint { color: var(--dim); font-size: 9px; line-height: 1.5; margin: 9px 0 0; }
+    .side-divider { color: var(--dim); font-size: 9px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; margin: 0 0 10px; }
+    .history-list { display: grid; gap: 10px; }
+    .history-item { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 10px; }
+    .history-icon { width: 22px; height: 22px; display: grid; place-items: center; background: var(--panel-raised); border-radius: 6px; font-size: 11px; }
+    .history-game { color: var(--ink); font-weight: 600; }
+    .history-time { color: var(--dim); font-size: 9px; margin-top: 2px; }
+    .history-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .history-amount.win { color: var(--mint); }
+    .history-amount.loss { color: var(--red); }
+    .empty-history { color: var(--dim); font-size: 10px; line-height: 1.5; }
+    .color-options { display: flex; justify-content: center; gap: 13px; margin: 20px 0 8px; }
+    .color-choice { width: 73px; border: 1px solid transparent; border-radius: 8px; background: transparent; padding: 8px 5px; color: rgba(255,255,255,.75); font-size: 10px; cursor: pointer; }
+    .color-choice:hover { background: rgba(255,255,255,.05); }
+    .color-choice.selected { border-color: rgba(255,255,255,.36); background: rgba(255,255,255,.09); color: white; }
+    .color-swatch { width: 37px; height: 37px; display: block; border-radius: 50%; margin: 0 auto 7px; border: 3px solid rgba(255,255,255,.72); box-shadow: 0 3px 12px rgba(0,0,0,.18); }
+    .swatch-red { background: #e65e58; }
+    .swatch-black { background: #27302e; }
+    .swatch-gold { background: #e0b750; }
+    .drawn-color { width: 72px; height: 72px; border-radius: 50%; border: 5px solid rgba(255,255,255,.78); box-shadow: 0 7px 20px rgba(0,0,0,.25); margin-bottom: 9px; animation: reveal .35s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes reveal { from { transform: scale(.7) rotate(-35deg); opacity: .3; } to { transform: scale(1) rotate(0); opacity: 1; } }
+    .tongits-hand { width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; padding: 0 8px; }
+    .tongits-hand .playing-card { width: 42px; height: 61px; margin: 0; font-size: 17px; cursor: pointer; transition: transform .15s, outline .15s; }
+    .tongits-hand .playing-card .corner { font-size: 7px; top: 4px; left: 4px; }
+    .tongits-hand .playing-card .corner.bottom { right: 4px; bottom: 4px; }
+    .tongits-hand .playing-card.selected { outline: 2px solid var(--gold); transform: translateY(-7px); }
+    .tongits-meta { display: flex; justify-content: center; gap: 18px; color: rgba(239,246,231,.72); font-size: 10px; margin-bottom: 12px; }
+    .tongits-meta strong { color: var(--gold); }
+    .footer-note { color: var(--dim); text-align: center; font-size: 9px; margin-top: 18px; }
+    .toast { position: fixed; z-index: 5; bottom: 20px; left: 50%; transform: translate(-50%, 15px); opacity: 0; pointer-events: none; padding: 10px 15px; color: var(--ink); background: #263b33; border: 1px solid rgba(199,239,155,.22); border-radius: 7px; font-size: 11px; transition: .2s; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 68px minmax(0,1fr); }
+      .rail { padding: 20px 9px 14px; align-items: center; }
+      .brand { padding: 0; margin-bottom: 32px; }
+      .brand-mark { width: 38px; height: 38px; }
+      .brand-copy, .rail-label, .nav-text, .nav-count, .demo-note { display: none; }
+      .nav-list { width: 100%; }
+      .nav-button { justify-content: center; padding: 12px 0; }
+      .nav-icon { font-size: 17px; }
+      .main { padding: 0 22px 30px; }
+    }
+    @media (max-width: 760px) {
+      .table-layout { grid-template-columns: minmax(0, 1fr); }
+      .side-panel { display: grid; grid-template-columns: minmax(220px, .85fr) minmax(220px, 1.15fr); }
+      .side-section:first-child { border-right: 1px solid var(--line); border-bottom: 0; }
+      .online { display: none; }
+    }
+    @media (max-width: 560px) {
+      .app { grid-template-columns: minmax(0, 1fr); padding-bottom: 61px; }
+      .rail { position: fixed; z-index: 4; inset: auto 0 0; width: 100%; height: 60px; padding: 5px 8px; border-right: 0; border-top: 1px solid var(--line); background: #14221f; }
+      .brand, .rail-bottom { display: none; }
+      .nav-list { display: flex; justify-content: space-around; gap: 2px; }
+      .nav-button { width: auto; flex: 1; min-height: 48px; flex-direction: column; gap: 2px; padding: 4px 0; font-size: 9px; }
+      .nav-text { display: block; font-size: 9px; }
+      .nav-icon { font-size: 15px; }
+      .main { padding: 0 14px 23px; }
+      .topbar { height: 65px; }
+      .crumb { font-size: 10px; }
+      .crumb { font-size: 0; white-space: nowrap; }
+      .crumb span { display: none; }
+      .crumb b { font-size: 10px; }
+      .top-actions { gap: 6px; }
+      .demo-pill { font-size: 8px; padding: 6px 7px; }
+      .wallet { gap: 6px; padding: 6px; }
+      .balance { min-width: 55px; font-size: 11px; }
+      .add-funds { padding: 7px 8px; font-size: 9px; }
+      .coin { width: 19px; height: 19px; }
+      .page-heading { padding: 23px 0 17px; }
+      h1 { font-size: 25px; }
+      .heading-copy { font-size: 10px; }
+      .game-tabs { gap: 3px; margin-bottom: 14px; }
+      .game-tab { padding: 8px 9px; font-size: 10px; }
+      .felt { min-height: 350px; padding: 19px 12px 15px; }
+      .table-center { min-height: 215px; }
+      .hands { gap: 14px; }
+      .hand { min-width: 115px; }
+      .playing-card { width: 51px; height: 75px; }
+      .opponent-cards .playing-card { width: 28px; height: 40px; margin-left: -5px; }
+      .side-panel { grid-template-columns: 1fr; }
+      .side-section:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
+      .footer-note { line-height: 1.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Main navigation">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">L</div><div class="brand-copy"><div class="brand-name">Lucky Lantern</div><div class="brand-sub">THE SOCIAL GAME ROOM</div></div></div>
+      <div class="rail-label">Play</div>
+      <nav class="nav-list" id="sideNav">
+        <button class="nav-button active" data-game="lucky9"><span class="nav-icon">♧</span><span class="nav-text">Lucky 9</span></button>
+        <button class="nav-button" data-game="tongits"><span class="nav-icon">♠</span><span class="nav-text">Tongits</span></button>
+        <button class="nav-button" data-game="color"><span class="nav-icon">◉</span><span class="nav-text">Color Draw</span></button>
+      </nav>
+      <div class="rail-bottom"><div class="demo-note"><strong>Just for fun</strong><p>Demo credits have no cash value. No deposits or withdrawals.</p></div></div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">Game room <span>/</span> <b id="crumbGame">Lucky 9</b></div>
+        <div class="top-actions"><div class="demo-pill">DEMO CREDITS · NO CASH VALUE</div><div class="wallet"><span class="coin" aria-hidden="true">L</span><div class="balance"><span id="balance">10,000</span><small>demo credits</small></div><button class="add-funds" id="refillButton" title="Add 2,500 demo credits">+ Refill</button></div></div>
+      </header>
+      <section class="page-heading">
+        <div><div class="eyebrow">Pull up a chair</div><h1>Pick your table.</h1><p class="heading-copy">Good games, good company. Play a hand on us.</p></div>
+        <div class="online"><span class="online-dot"></span> Solo practice · demo games</div>
+      </section>
+      <nav class="game-tabs" aria-label="Choose a game">
+        <button class="game-tab active" data-game="lucky9"><span class="tab-icon">♧</span>Lucky 9</button>
+        <button class="game-tab" data-game="tongits"><span class="tab-icon">♠</span>Tongits table</button>
+        <button class="game-tab" data-game="color"><span class="tab-icon">◉</span>Color draw</button>
+      </nav>
+      <div class="table-layout">
+        <section class="play-panel" aria-label="Game table">
+          <div class="table-topline"><div class="table-name" id="tableName">Lucky 9 · Practice table</div><div class="table-limits">Min. 10 <span aria-hidden="true">·</span> Max. 2,500 credits</div></div>
+          <div class="felt" id="felt" aria-live="polite"></div>
+          <div class="game-controls" id="gameControls"></div>
+          <p class="footer-note">Play with demo credits only. Credits cannot be bought, sold, or redeemed.</p>
+        </section>
+        <aside class="side-panel" aria-label="Bet and recent rounds">
+          <section class="side-section">
+            <div class="section-head"><h3>YOUR WAGER</h3><span class="min-max">10 – 2,500</span></div>
+            <div class="bet-amount"><button class="bet-adjust" id="betDown" aria-label="Decrease wager">−</button><div class="bet-value"><span aria-hidden="true">L</span> <span id="betValue">100</span></div><button class="bet-adjust" id="betUp" aria-label="Increase wager">+</button></div>
+            <div class="bet-options"><button class="bet-chip" data-bet="25">25</button><button class="bet-chip active" data-bet="100">100</button><button class="bet-chip" data-bet="250">250</button><button class="bet-chip" data-bet="500">500</button></div>
+            <p class="bet-hint">Wager amounts use demo credits only. Choose a low-stakes table or refill anytime.</p>
+          </section>
+          <section class="side-section"><div class="section-head"><h3>RECENT ROUNDS</h3><span class="min-max" id="roundCount">0 played</span></div><div class="history-list" id="historyList"><div class="empty-history">Your rounds will show up here. Set a wager and start playing.</div></div></section>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    const STORAGE_KEY = 'lucky-lantern-demo-v1';
+    const SUITS = ['♠', '♥', '♦', '♣'];
+    const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    const GAME_NAMES = { lucky9: 'Lucky 9', tongits: 'Tongits', color: 'Color Draw' };
+    const GAME_ICONS = { lucky9: '♧', tongits: '♠', color: '◉' };
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    let balance = Number.isFinite(saved.balance) ? saved.balance : 10000;
+    let bet = 100;
+    let activeGame = 'lucky9';
+    let luckyRound = null;
+    let tongitsRound = null;
+    let chosenColor = 'red';
+    let colorBusy = false;
+    let history = Array.isArray(saved.history) ? saved.history.slice(0, 5) : [];
+    let toastTimer;
+
+    const $ = (selector) => document.querySelector(selector);
+    const fmt = (value) => Math.max(0, Math.floor(value)).toLocaleString('en-US');
+    const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify({ balance, history }));
+    const setBalance = (value) => { balance = Math.max(0, Math.floor(value)); $('#balance').textContent = fmt(balance); save(); };
+    const showToast = (message) => {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    };
+    const shuffledDeck = () => {
+      const deck = SUITS.flatMap((suit) => RANKS.map((rank) => ({ suit, rank })));
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    };
+    const cardValue = (card) => card.rank === 'A' ? 1 : ['J', 'Q', 'K'].includes(card.rank) ? 10 : Number(card.rank);
+    const luckyScore = (cards) => cards.reduce((sum, card) => sum + cardValue(card), 0) % 10;
+    const cardHTML = (card, extraClass = '') => {
+      const red = card.suit === '♥' || card.suit === '♦';
+      const label = `${card.rank}${card.suit}`;
+      return `<div class="playing-card ${red ? 'red' : ''} ${extraClass}" aria-label="${label}"><span class="corner">${card.rank}<br>${card.suit}</span>${card.suit}<span class="corner bottom">${card.rank}<br>${card.suit}</span></div>`;
+    };
+    const renderHand = (title, cards, hidden = false) => `<div class="hand"><div class="hand-caption">${title}</div><div class="hand-cards">${cards.length ? cards.map((card) => hidden ? '<div class="playing-card back" aria-label="Face down card">✦</div>' : cardHTML(card)).join('') : '<span style="color:rgba(239,246,231,.5);font-size:10px;padding:25px 0">Waiting for the deal</span>'}</div></div>`;
+    const updateBalance = () => { $('#balance').textContent = fmt(balance); $('#betValue').textContent = fmt(bet); };
+    const recordRound = (game, result, amount) => {
+      history.unshift({ game, result, amount, time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) });
+      history = history.slice(0, 5);
+      save();
+      renderHistory();
+    };
+    function renderHistory() {
+      $('#roundCount').textContent = `${history.length} played`;
+      $('#historyList').innerHTML = history.length ? history.map((item) => `<div class="history-item"><span class="history-icon">${GAME_ICONS[item.game] || '✦'}</span><div><div class="history-game">${GAME_NAMES[item.game] || 'Game'} · ${item.result}</div><div class="history-time">${item.time}</div></div><span class="history-amount ${item.amount >= 0 ? 'win' : 'loss'}">${item.amount >= 0 ? '+' : '−'}${fmt(Math.abs(item.amount))}</span></div>`).join('') : '<div class="empty-history">Your rounds will show up here. Set a wager and start playing.</div>';
+    }
+    function setGame(game) {
+      activeGame = game;
+      $('#crumbGame').textContent = GAME_NAMES[game];
+      $('#tableName').textContent = `${GAME_NAMES[game]} · Practice table`;
+      document.querySelectorAll('[data-game]').forEach((button) => button.classList.toggle('active', button.dataset.game === game));
+      renderGame();
+    }
+    function startBet() {
+      if (bet > balance) { showToast('Not enough demo credits. Refill your wallet to keep playing.'); return false; }
+      setBalance(balance - bet);
+      return true;
+    }
+    function renderLucky() {
+      const playing = luckyRound && !luckyRound.done;
+      const player = luckyRound?.player || [];
+      const dealer = luckyRound?.dealer || [];
+      const scoreLabel = (cards) => cards.length ? `Score ${luckyScore(cards)}` : '';
+      $('#felt').innerHTML = `<div class="table-label"><span class="spark">✦</span> Lucky 9 <span>·</span> Dealer's choice</div><div class="table-center">${playing || luckyRound?.done ? `<div class="hands">${renderHand(`Your hand · ${scoreLabel(player)}`, player)}${renderHand(`Dealer · ${playing ? 'hidden' : scoreLabel(dealer)}`, dealer, playing)}</div>` : `<h2>One card can change everything.</h2><p>Get closer to 9 than the dealer. Face cards count as zero.</p>`}</div><div class="table-footer ${luckyRound?.done ? 'result-text' : ''}">${luckyRound?.message || 'Ace counts as 1 · Face cards count as 0 · Closest to 9 wins'}</div>`;
+      const controls = $('#gameControls');
+      if (!luckyRound || luckyRound.done) {
+        controls.innerHTML = `<button class="primary-button" id="dealLucky">Deal hand · ${fmt(bet)} credits</button>`;
+        $('#dealLucky').onclick = dealLucky;
+      } else {
+        controls.innerHTML = `<button class="primary-button" id="hitLucky" ${player.length >= 3 ? 'disabled' : ''}>Hit</button><button class="secondary-button" id="standLucky">Stand</button>`;
+        $('#hitLucky').onclick = hitLucky;
+        $('#standLucky').onclick = standLucky;
+      }
+    }
+    function dealLucky() {
+      if (!startBet()) return;
+      const deck = shuffledDeck();
+      luckyRound = { deck, player: [deck.pop(), deck.pop()], dealer: [deck.pop(), deck.pop()], done: false, stake: bet };
+      renderLucky();
+    }
+    function hitLucky() {
+      luckyRound.player.push(luckyRound.deck.pop());
+      if (luckyRound.player.length >= 3 || luckyScore(luckyRound.player) === 9) standLucky();
+      else renderLucky();
+    }
+    function standLucky() {
+      while (luckyScore(luckyRound.dealer) < 6 && luckyRound.dealer.length < 3) luckyRound.dealer.push(luckyRound.deck.pop());
+      const playerScore = luckyScore(luckyRound.player);
+      const dealerScore = luckyScore(luckyRound.dealer);
+      let message;
+      let change;
+      if (playerScore > dealerScore) { message = `You win · ${playerScore} to ${dealerScore}`; change = luckyRound.stake * 2; }
+      else if (playerScore === dealerScore) { message = `Push · both scored ${playerScore}`; change = luckyRound.stake; }
+      else { message = `Dealer wins · ${dealerScore} to ${playerScore}`; change = 0; }
+      setBalance(balance + change);
+      recordRound('lucky9', change > luckyRound.stake ? 'Win' : change ? 'Push' : 'Loss', change - luckyRound.stake);
+      luckyRound.done = true;
+      luckyRound.message = `${message}${change ? ` · ${change === luckyRound.stake ? 'wager returned' : `+${fmt(change - luckyRound.stake)} credits`}` : ''}`;
+      renderLucky();
+    }
+    function renderColor() {
+      const last = colorRound;
+      const colors = { red: '#e65e58', black: '#27302e', gold: '#e0b750' };
+      const colorNames = { red: 'Red', black: 'Black', gold: 'Gold' };
+      $('#felt').innerHTML = `<div class="table-label"><span class="spark">✦</span> Color draw <span>·</span> Pick a color</div><div class="table-center">${last ? `<div class="drawn-color" style="background:${colors[last.color]}"></div><h2>${last.color === last.pick ? 'Right on the color.' : 'Not this time.'}</h2><p>${colorNames[last.color]} drawn · ${colorNames[last.pick]} picked</p>` : `<h2>Trust your color instinct.</h2><p>Pick a color, place your wager, and draw.</p>`}<div class="color-options">${Object.keys(colors).map((color) => `<button class="color-choice ${chosenColor === color ? 'selected' : ''}" data-color="${color}" aria-pressed="${chosenColor === color}"><span class="color-swatch swatch-${color}"></span>${colorNames[color]}${color === 'gold' ? ' · 12×' : ' · 2×'}</button>`).join('')}</div></div><div class="table-footer ${last ? 'result-text' : ''}">${last ? (last.color === last.pick ? `Wager paid · +${fmt(last.payout - last.stake)} credits` : `Round over · ${fmt(last.stake)} credits wagered`) : 'Red / black: 46% each · Gold: 8% · Pays 2× / 12×'}</div>`;
+      document.querySelectorAll('[data-color]').forEach((button) => button.onclick = () => { if (!colorBusy) { chosenColor = button.dataset.color; renderColor(); } });
+      $('#gameControls').innerHTML = `<button class="primary-button" id="drawColor" ${colorBusy ? 'disabled' : ''}>${colorBusy ? 'Drawing…' : `Draw · ${fmt(bet)} credits`}</button>`;
+      $('#drawColor').onclick = playColor;
+    }
+    let colorRound = null;
+    function playColor() {
+      if (colorBusy || !startBet()) return;
+      colorBusy = true;
+      colorRound = null;
+      renderColor();
+      setTimeout(() => {
+        const draw = Math.random();
+        const color = draw < 0.46 ? 'red' : draw < 0.92 ? 'black' : 'gold';
+        const payout = color === chosenColor ? bet * (color === 'gold' ? 12 : 2) : 0;
+        if (payout) setBalance(balance + payout);
+        colorRound = { color, pick: chosenColor, payout, stake: bet };
+        colorBusy = false;
+        recordRound('color', payout ? 'Win' : 'Loss', payout - bet);
+        renderColor();
+      }, 650);
+    }
+    function handDeadwood(cards) {
+      const used = new Set();
+      const byRank = new Map();
+      cards.forEach((card, index) => {
+        if (!byRank.has(card.rank)) byRank.set(card.rank, []);
+        byRank.get(card.rank).push(index);
+      });
+      for (const indices of byRank.values()) if (indices.length >= 3) indices.slice(0, 3).forEach((index) => used.add(index));
+      for (const suit of SUITS) {
+        const indices = cards.map((card, index) => ({ card, index })).filter((entry) => entry.card.suit === suit && !used.has(entry.index)).sort((a, b) => RANKS.indexOf(a.card.rank) - RANKS.indexOf(b.card.rank));
+        let run = [];
+        const markRun = () => { if (run.length >= 3) run.forEach((entry) => used.add(entry.index)); };
+        for (const entry of indices) {
+          if (run.length && RANKS.indexOf(entry.card.rank) !== RANKS.indexOf(run[run.length - 1].card.rank) + 1) { markRun(); run = []; }
+          run.push(entry);
+        }
+        markRun();
+      }
+      return cards.reduce((sum, card, index) => sum + (used.has(index) ? 0 : Math.min(cardValue(card), 10)), 0);
+    }
+    function renderTongits() {
+      const round = tongitsRound;
+      const started = round && !round.done;
+      $('#felt').innerHTML = `<div class="table-label"><span class="spark">✦</span> Tongits <span>·</span> Practice table</div><div class="table-center">${!round ? `<h2>Make your melds.</h2><p>Draw and discard for three turns. Lowest deadwood wins.</p>` : `<div class="tongits-meta"><span>Opponent <strong>${round.turns}/3 turns</strong></span><span>Stock <strong>${round.deck.length}</strong></span><span>Discard <strong>${round.discard.at(-1)?.rank || '—'}${round.discard.at(-1)?.suit || ''}</strong></span></div><div class="hand-caption">OPPONENT · ${started ? '12 cards' : `${handDeadwood(round.opponent)} deadwood`}</div><div class="hand-cards opponent-cards" style="margin-bottom:14px">${Array.from({ length: round.opponent.length }, () => '<div class="playing-card back">✦</div>').join('')}</div><div class="hand-caption">YOUR HAND · ${started ? `${round.hand.length} cards` : `${handDeadwood(round.hand)} deadwood`}</div><div class="tongits-hand">${round.hand.map((card, index) => cardHTML(card, round.selected === index ? 'selected' : '')).join('')}</div>`}</div><div class="table-footer ${round?.done ? 'result-text' : ''}">${round?.message || (started ? 'Select a card to discard after drawing.' : 'Three of a kind and suited runs of 3+ form melds.')}</div>`;
+      const controls = $('#gameControls');
+      if (!round || round.done) {
+        controls.innerHTML = `<button class="primary-button" id="startTongits">Deal in · ${fmt(bet)} credits</button>`;
+        $('#startTongits').onclick = startTongits;
+      } else if (!round.drawn) {
+        controls.innerHTML = `<button class="primary-button" id="drawStock">Draw from stock</button><button class="secondary-button" id="takeDiscard" ${round.discard.length ? '' : 'disabled'}>Take discard</button>`;
+        $('#drawStock').onclick = () => drawTongits(false);
+        $('#takeDiscard').onclick = () => drawTongits(true);
+      } else {
+        controls.innerHTML = `<button class="primary-button" id="discardCard" ${round.selected === null ? 'disabled' : ''}>Discard selected</button>`;
+        $('#discardCard').onclick = discardTongits;
+        document.querySelectorAll('.tongits-hand .playing-card').forEach((card, index) => card.onclick = () => { round.selected = index; renderTongits(); });
+      }
+    }
+    function startTongits() {
+      if (!startBet()) return;
+      const deck = shuffledDeck();
+      tongitsRound = { deck, hand: deck.splice(0, 12), opponent: deck.splice(0, 12), discard: [deck.pop()], turns: 0, selected: null, drawn: false, done: false, stake: bet };
+      renderTongits();
+    }
+    function drawTongits(fromDiscard) {
+      const round = tongitsRound;
+      const card = fromDiscard ? round.discard.pop() : round.deck.pop();
+      if (!card) { showToast('No cards left to draw.'); return; }
+      round.hand.push(card);
+      round.drawn = true;
+      round.selected = null;
+      renderTongits();
+    }
+    function discardTongits() {
+      const round = tongitsRound;
+      if (round.selected === null) return;
+      round.discard.push(round.hand.splice(round.selected, 1)[0]);
+      round.selected = null;
+      round.drawn = false;
+      round.turns++;
+      round.opponent.push(round.deck.pop());
+      round.opponent.splice(Math.floor(Math.random() * round.opponent.length), 1);
+      if (round.turns >= 3) finishTongits();
+      else renderTongits();
+    }
+    function finishTongits() {
+      const round = tongitsRound;
+      const playerScore = handDeadwood(round.hand);
+      const opponentScore = handDeadwood(round.opponent);
+      let change = 0;
+      if (playerScore < opponentScore) { change = round.stake * 2; round.message = `You win · ${playerScore} to ${opponentScore} deadwood · +${fmt(round.stake)} credits`; }
+      else if (playerScore === opponentScore) { change = round.stake; round.message = `Push · both have ${playerScore} deadwood · wager returned`; }
+      else round.message = `Opponent wins · ${opponentScore} to ${playerScore} deadwood`;
+      setBalance(balance + change);
+      recordRound('tongits', change > round.stake ? 'Win' : change ? 'Push' : 'Loss', change - round.stake);
+      round.done = true;
+      renderTongits();
+    }
+    function renderGame() {
+      if (activeGame === 'lucky9') renderLucky();
+      else if (activeGame === 'color') renderColor();
+      else renderTongits();
+      updateBalance();
+    }
+    document.querySelectorAll('[data-game]').forEach((button) => button.addEventListener('click', () => setGame(button.dataset.game)));
+    document.querySelectorAll('[data-bet]').forEach((button) => button.addEventListener('click', () => {
+      bet = Number(button.dataset.bet);
+      document.querySelectorAll('[data-bet]').forEach((chip) => chip.classList.toggle('active', chip === button));
+      updateBalance();
+      renderGame();
+    }));
+    $('#betDown').addEventListener('click', () => { bet = Math.max(10, bet - 25); updateBalance(); renderGame(); });
+    $('#betUp').addEventListener('click', () => { bet = Math.min(2500, bet + 25); updateBalance(); renderGame(); });
+    $('#refillButton').addEventListener('click', () => { setBalance(balance + 2500); showToast('2,500 demo credits added. Have fun at the tables.'); });
+    updateBalance();
+    renderHistory();
+    renderGame();
+  </script>
+</body>
+</html>
